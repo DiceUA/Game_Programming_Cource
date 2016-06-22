@@ -1,0 +1,25 @@
+# =============== #
+# VS  generated #
+# =============== #
+/[Oo]bj/
+/[Bb]in/
+/[Dd]ebug/
+
+# ===================================== #
+# Visual Studio / MonoDevelop generated #
+# ===================================== #
+ExportedObj/
+*.svd
+*.userprefs
+*.csproj
+*.pidb
+*.suo
+*.sln
+*.user
+*.unityproj
+*.booproj
+
+# Other
+Thumbs.db
+*/bin/
+*/obj/
