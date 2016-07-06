@@ -175,8 +175,24 @@ namespace GameProject
             }
 
             // check and resolve collisions between burger and teddy bears
-
+            foreach (var bear in bears)
+            {
+                if(bear.CollisionRectangle.Intersects(burger.CollisionRectangle))
+                {
+                    burger.Health -= GameConstants.BearDamage;
+                    bear.Active = false;
+                    explosions.Add(new Explosion(explosionSpriteStrip, bear.Location.X, bear.Location.Y));
+                }
+            }
             // check and resolve collisions between burger and projectiles
+            foreach (var proj in projectiles)
+            {
+                if(proj.Type == ProjectileType.TeddyBear && proj.CollisionRectangle.Intersects(burger.CollisionRectangle) && proj.Active)
+                {
+                    burger.Health -= GameConstants.TeddyBearProjectileDamage;
+                    proj.Active = false;
+                }
+            }
 
             // check and resolve collisions between teddy bears and projectiles
             foreach (TeddyBear bear in bears)
@@ -217,6 +233,16 @@ namespace GameProject
                 }
             }
 
+            // Spawn new bear until we have max - see constants
+            // if expression - also works
+            //if(bears.Count < GameConstants.MaxBears)
+            //{
+            //    SpawnBear();
+            //}
+            while(bears.Count < GameConstants.MaxBears)
+            {
+                SpawnBear();
+            }
             base.Update(gameTime);
         }
 
@@ -309,9 +335,13 @@ namespace GameProject
                         
             // create new bear
             TeddyBear tb = new TeddyBear(Content, @"graphics\teddybear", (int)location.X, (int)location.Y, velocity, null, null);
-            
-            // make sure we don't spawn into a collision
 
+            // make sure we don't spawn into a collision            
+            while(!CollisionUtils.IsCollisionFree(tb.CollisionRectangle, GetCollisionRectangles()))
+            {
+                tb.X = GetRandomLocation(GameConstants.SpawnBorderSize, GameConstants.WindowWidth - GameConstants.SpawnBorderSize);
+                tb.Y = GetRandomLocation(GameConstants.SpawnBorderSize, GameConstants.WindowHeight - GameConstants.SpawnBorderSize);
+            }
             // add new bear to list
             bears.Add(tb);
         }
