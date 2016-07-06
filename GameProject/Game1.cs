@@ -82,22 +82,33 @@ namespace GameProject
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // load audio content
+            burgerDamage = Content.Load<SoundEffect>(@"audio\BurgerDamage");
+            burgerDeath = Content.Load<SoundEffect>(@"audio\BurgerDeath");
+            burgerShot = Content.Load<SoundEffect>(@"audio\BurgerShot");
+            explosion = Content.Load<SoundEffect>(@"audio\Explosion");
+            teddyBounce = Content.Load<SoundEffect>(@"audio\TeddyBounce");
+            teddyShot = Content.Load<SoundEffect>(@"audio\TeddyShot");
+            // Set master volume to 10% coz effects too loud
+            SoundEffect.MasterVolume = 0.1f;
 
             // load sprite font
+            font = Content.Load<SpriteFont>(@"fonts\Arial20");
 
             // load projectile and explosion sprites
             teddyBearProjectileSprite = Content.Load<Texture2D>(@"graphics\teddybearprojectile");
             frenchFriesSprite = Content.Load<Texture2D>(@"graphics\frenchfries");
             explosionSpriteStrip = Content.Load<Texture2D>(@"graphics\explosion");
             // add initial game objects
-            burger = new Burger(Content,@"graphics\burger",graphics.PreferredBackBufferWidth/2, graphics.PreferredBackBufferHeight*7/8,null);
+            burger = new Burger(Content,@"graphics\burger",graphics.PreferredBackBufferWidth/2, graphics.PreferredBackBufferHeight*7/8,burgerShot);
 
             //multiple teddies
             for (int i = 0; i < GameConstants.MaxBears; i++)
             {
                 SpawnBear();
-            }            
+            }
             // set initial health and score strings
+            healthString = GameConstants.HealthPrefix + burger.Health;
+            scoreString = GameConstants.ScorePrefix + score;
         }
 
         /// <summary>
@@ -120,8 +131,11 @@ namespace GameProject
                 Exit();
 
             // get current mouse state and update burger
-            MouseState mouse = Mouse.GetState();
-            burger.Update(gameTime, mouse);
+            //MouseState mouse = Mouse.GetState();
+            //burger.Update(gameTime, mouse);
+            // get current keyboard state and update burger
+            KeyboardState keyboard = Keyboard.GetState();
+            burger.Update(gameTime, keyboard);
 
             // update other game objects
             foreach (TeddyBear bear in bears)
@@ -169,6 +183,8 @@ namespace GameProject
                                 bears[j].Velocity = colInfo.SecondVelocity;
                                 bears[j].DrawRectangle = colInfo.SecondDrawRectangle;
                             }
+                            // play bounce sound
+                            teddyBounce.Play();
                         }
                     }
                 }
@@ -181,7 +197,13 @@ namespace GameProject
                 {
                     burger.Health -= GameConstants.BearDamage;
                     bear.Active = false;
-                    explosions.Add(new Explosion(explosionSpriteStrip, bear.Location.X, bear.Location.Y));
+                    explosions.Add(new Explosion(explosionSpriteStrip, bear.Location.X, bear.Location.Y, explosion));
+                    // update health
+                    healthString = GameConstants.HealthPrefix + burger.Health;
+                    // play sound
+                    burgerDamage.Play();
+
+                    CheckBurgerKill();
                 }
             }
             // check and resolve collisions between burger and projectiles
@@ -191,6 +213,12 @@ namespace GameProject
                 {
                     burger.Health -= GameConstants.TeddyBearProjectileDamage;
                     proj.Active = false;
+                    // update health
+                    healthString = GameConstants.HealthPrefix + burger.Health;
+                    // play sound
+                    burgerDamage.Play();
+
+                    CheckBurgerKill();
                 }
             }
 
@@ -203,10 +231,13 @@ namespace GameProject
                     {
                         bear.Active = false;
                         projectile.Active = false;
-                        explosions.Add(new Explosion(explosionSpriteStrip, bear.CollisionRectangle.Center.X, bear.CollisionRectangle.Center.Y));
+                        explosions.Add(new Explosion(explosionSpriteStrip, bear.CollisionRectangle.Center.X, bear.CollisionRectangle.Center.Y, explosion));
+                        // update score
+                        score += GameConstants.BearPoints;
+                        scoreString = GameConstants.ScorePrefix + score;
                     }
                 }
-            }
+            }            
 
             // clean out inactive teddy bears and add new ones as necessary
             for (int i = bears.Count - 1; i >= 0; i--)
@@ -272,6 +303,8 @@ namespace GameProject
             }
 
             // draw score and health
+            spriteBatch.DrawString(font, healthString, GameConstants.HealthLocation, Color.White);
+            spriteBatch.DrawString(font, scoreString, GameConstants.ScoreLocation, Color.White);
 
             spriteBatch.End();
 
@@ -334,7 +367,7 @@ namespace GameProject
             Vector2 velocity = new Vector2((float)Math.Cos(angle) * speed, (float)Math.Sin(angle) * speed);
                         
             // create new bear
-            TeddyBear tb = new TeddyBear(Content, @"graphics\teddybear", (int)location.X, (int)location.Y, velocity, null, null);
+            TeddyBear tb = new TeddyBear(Content, @"graphics\teddybear", (int)location.X, (int)location.Y, velocity, teddyBounce, teddyShot);
 
             // make sure we don't spawn into a collision            
             while(!CollisionUtils.IsCollisionFree(tb.CollisionRectangle, GetCollisionRectangles()))
@@ -385,7 +418,11 @@ namespace GameProject
         /// </summary>
         private void CheckBurgerKill()
         {
-
+            if(burger.Health <= 0 && !burgerDead)
+            {
+                burgerDead = true;
+                burgerDeath.Play();
+            }
         }
 
         #endregion

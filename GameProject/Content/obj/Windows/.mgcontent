@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SourceFileCollection xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Profile>Reach</Profile>
+  <Platform>Windows</Platform>
+  <Config />
+  <SourceFiles>
+    <File>I:/Dev/Projects/Begining_Game_Programming_Cource/GameProject/Content/fonts/Arial20.spritefont</File>
+    <File>I:/Dev/Projects/Begining_Game_Programming_Cource/GameProject/Content/audio/BurgerDamage.wav</File>
+    <File>I:/Dev/Projects/Begining_Game_Programming_Cource/GameProject/Content/audio/BurgerDeath.wav</File>
+    <File>I:/Dev/Projects/Begining_Game_Programming_Cource/GameProject/Content/audio/BurgerShot.wav</File>
+    <File>I:/Dev/Projects/Begining_Game_Programming_Cource/GameProject/Content/audio/Explosion.wav</File>
+    <File>I:/Dev/Projects/Begining_Game_Programming_Cource/GameProject/Content/audio/TeddyBounce.wav</File>
+    <File>I:/Dev/Projects/Begining_Game_Programming_Cource/GameProject/Content/audio/TeddyShot.wav</File>
+  </SourceFiles>
+</SourceFileCollection>
